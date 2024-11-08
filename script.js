@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 // Pendulum and Cart Parameters
 let cartX = canvas.width / 2;
 let cartY = 300;
-let pendulumLength = 150;
+let pendulumLength = 1;
 let angle = Math.PI * 3/4; // Initial angle
 let angleVelocity = 0;
 let angleAcceleration = 0;
@@ -32,8 +32,8 @@ function drawCart() {
 }
 
 function drawPendulum() {
-  let pendulumX = cartX + pendulumLength * Math.sin(angle);
-  let pendulumY = cartY + pendulumLength * Math.cos(angle);
+  let pendulumX = cartX + 150*pendulumLength * Math.sin(angle);
+  let pendulumY = cartY + 150*pendulumLength * Math.cos(angle);
   
   ctx.beginPath();
   ctx.moveTo(cartX, cartY);
