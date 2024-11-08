@@ -10,6 +10,8 @@ let angleVelocity = 0;
 let angleAcceleration = 0;
 let gravity = 0.98;
 let damping = 0.995; // Damping factor to slow motion
+let cartMass = 1;
+let pendulumMass = 0.1;
 
 let targetCartX = cartX; // Target position for the cart
 let cartVelocity = 0; // Cart velocity
@@ -53,8 +55,7 @@ function updateCartPosition() {
 
 function updatePhysics() {
   // Update pendulum dynamics with cart acceleration
-  angleAcceleration = (-gravity / pendulumLength) * Math.sin(angle) 
-                      - (cartAcceleration / pendulumLength) * Math.cos(angle);
+  angleAcceleration = -((pendulumMass+cartMass)/(cartMass+pendulumMass*sin(angle)^2)/pendulumLength)*sin(angle)*(angleVelocity*cartVelocity+gravity);
   angleVelocity += angleAcceleration;
   angleVelocity *= damping; // Apply damping
   angle += angleVelocity;
