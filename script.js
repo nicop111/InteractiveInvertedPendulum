@@ -9,7 +9,7 @@ let angle = Math.PI * 3/4; // Initial angle
 let angleVelocity = 0;
 let angleAcceleration = 0;
 let gravity = 9.81;
-let damping = 0.95; // Damping factor to slow motion
+let damping = 0.9; // Damping factor to slow motion
 let cartMass = 1;
 let pendulumMass = 0.1;
 
@@ -29,7 +29,8 @@ canvas.addEventListener('mousemove', (event) => {
 
 function drawCart() {
   ctx.fillStyle = 'grey';
-  ctx.fillRect(cartX - 50, cartY, 100, 30);
+  cartX_plot = 150*cartX;
+  ctx.fillRect(cartX_plot - 50, cartY, 100, 30);
 }
 
 function drawPendulum() {
