@@ -56,7 +56,7 @@ function updatePhysics() {
   lastUpdateTime = currentTime;
 
   // Spring force to mouse
-  let force_ext = 10 * (targetCartX - cartX);
+  let force_ext = 10 * (targetCartX - cartX - cartVelocity);
 
   // Update dynamics (Euler forward)
   cartAcceleration = (
