@@ -42,7 +42,7 @@ function drawPendulum() {
 }
 
 function updateCartPosition() {
-  const cartSpeed = 5; // Speed factor for smoother cart movement
+  const cartSpeed = 1; // Speed factor for smoother cart movement
   cartX += (targetCartX - cartX) * cartSpeed; // Smooth transition to target position
 }
 
