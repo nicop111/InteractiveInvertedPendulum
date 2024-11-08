@@ -88,7 +88,7 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
-  cartVelocity += 0.9*cartAcceleration * deltaTime;
+  cartVelocity += 0.7*cartAcceleration * deltaTime;
   angleVelocity += damping*angleAcceleration * deltaTime;
 
   cartX += cartVelocity * deltaTime;
