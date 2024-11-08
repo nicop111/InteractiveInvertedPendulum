@@ -12,6 +12,8 @@ let gravity = 0.98;
 let damping = 0.995; // Damping factor to slow motion
 
 let targetCartX = cartX; // Target position for the cart
+let cartVelocity = 0; // Cart velocity
+let cartAcceleration = 0; // Cart acceleration
 
 // Event Listener for Mouse Movement
 canvas.addEventListener('mousemove', (event) => {
@@ -42,12 +44,17 @@ function drawPendulum() {
 }
 
 function updateCartPosition() {
-  const cartSpeed = 1; // Speed factor for smoother cart movement
-  cartX += (targetCartX - cartX) * cartSpeed; // Smooth transition to target position
+  const cartSpeed = 0.1; // Speed factor for smoother cart movement
+  let previousCartX = cartX;
+  cartX += (targetCartX - cartX) * cartSpeed;
+  cartVelocity = cartX - previousCartX; // Calculate velocity
+  cartAcceleration = cartVelocity - (previousCartX - (cartX - cartVelocity)); // Approximate acceleration
 }
 
 function updatePhysics() {
-  angleAcceleration = (-gravity / pendulumLength) * Math.sin(angle);
+  // Update pendulum dynamics with cart acceleration
+  angleAcceleration = (-gravity / pendulumLength) * Math.sin(angle) 
+                      - (cartAcceleration / pendulumLength) * Math.cos(angle);
   angleVelocity += angleAcceleration;
   angleVelocity *= damping; // Apply damping
   angle += angleVelocity;
