@@ -55,7 +55,7 @@ function updateCartPosition() {
 
 function updatePhysics() {
   // Update pendulum dynamics with cart acceleration
-  angleAcceleration = -((pendulumMass+cartMass)/(cartMass+pendulumMass*sin(angle)^2)/pendulumLength)*sin(angle)*(angleVelocity*cartVelocity+gravity);
+  angleAcceleration = 0;
   angleVelocity += angleAcceleration;
   angleVelocity *= damping; // Apply damping
   angle += angleVelocity;
