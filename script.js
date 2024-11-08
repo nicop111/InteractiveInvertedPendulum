@@ -30,7 +30,7 @@ canvas.addEventListener('mousemove', (event) => {
 function drawCart() {
   ctx.fillStyle = 'grey';
   cartX_plot = 150*cartX;
-  ctx.fillRect(cartX_plot - 50, cartY, 100, 30);
+  ctx.fillRect(cartX_plot, cartY, 100, 30);
 }
 
 function drawPendulum() {
@@ -94,13 +94,13 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
-  cartVelocity += cartAcceleration * deltaTime;
+  cartVelocity += 10*cartAcceleration * deltaTime;
   cartVelocity *= damping;
-  angleVelocity += angleAcceleration * deltaTime;
+  angleVelocity += 10*angleAcceleration * deltaTime;
   angleVelocity *= damping;
 
-  cartX += cartVelocity * deltaTime;
-  angle += angleVelocity * deltaTime;
+  cartX += 10*cartVelocity * deltaTime;
+  angle += 10*angleVelocity * deltaTime;
 }
 
 function animate() {
