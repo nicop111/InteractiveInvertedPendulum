@@ -61,6 +61,17 @@ function updatePhysics() {
   angle += angleVelocity;
 }
 
+function logValues() {
+  logDiv.innerHTML = `
+    <strong>Cart Position (X):</strong> ${cartX.toFixed(2)} px<br>
+    <strong>Cart Velocity:</strong> ${cartVelocity.toFixed(2)} px/frame<br>
+    <strong>Cart Acceleration:</strong> ${cartAcceleration.toFixed(2)} px/frame²<br>
+    <strong>Pendulum Angle:</strong> ${(angle * 180 / Math.PI).toFixed(2)}°<br>
+    <strong>Pendulum Angular Velocity:</strong> ${angleVelocity.toFixed(2)} rad/frame<br>
+    <strong>Pendulum Angular Acceleration:</strong> ${angleAcceleration.toFixed(2)} rad/frame²
+  `;
+}
+
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   updateCartPosition();
