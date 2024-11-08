@@ -2,7 +2,7 @@ const canvas = document.getElementById('simulationCanvas');
 const ctx = canvas.getContext('2d');
 
 // Pendulum and Cart Parameters
-let cartX = canvas.width / 2;
+let cartX = canvas.width / 2 / 150; // Initial cart position in meters
 let cartY = 300;
 let pendulumLength = 1;
 let angle = Math.PI * 3/4; // Initial angle
@@ -24,6 +24,7 @@ let deltaTime = 0; // Time difference between frames in milliseconds
 canvas.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
   targetCartX = event.clientX - rect.left; // Get mouse position relative to canvas
+  targetCartX /= 150; // Convert to meters
 });
 
 function drawCart() {
@@ -32,11 +33,15 @@ function drawCart() {
 }
 
 function drawPendulum() {
-  let pendulumX = cartX + 150*pendulumLength * Math.sin(angle);
-  let pendulumY = cartY + 150*pendulumLength * Math.cos(angle);
+  // Umrechnungen 150px = 1m
+  cartX_plot = 150*cartX;
+  pendulumLength_plot = 150*pendulumLength;
+
+  let pendulumX = cartX_plot + pendulumLength_plot * Math.sin(angle);
+  let pendulumY = cartY + pendulumLength_plot * Math.cos(angle);
   
   ctx.beginPath();
-  ctx.moveTo(cartX, cartY);
+  ctx.moveTo(cartX_plot, cartY);
   ctx.lineTo(pendulumX, pendulumY);
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 3;
@@ -49,7 +54,7 @@ function drawPendulum() {
 }
 
 
-function updatePhysics() {
+function updatePhysics() {  
   // daltatime
   const currentTime = performance.now();
   deltaTime = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
