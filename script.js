@@ -9,18 +9,18 @@ let angle = Math.PI / 4; // Initial angle
 let angleVelocity = 0;
 let angleAcceleration = 0;
 let gravity = 0.98;
-let damping = 0.995; // Damping factor
+let damping = 0.995; // Damping factor to slow motion
 
-let mouseX = cartX; // Initial mouse position matches cart's starting position
+let targetCartX = cartX; // Target position for the cart
 
 // Event Listener for Mouse Movement
 canvas.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
-  mouseX = event.clientX - rect.left;
+  targetCartX = event.clientX - rect.left; // Get mouse position relative to canvas
 });
 
 function drawCart() {
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = 'grey';
   ctx.fillRect(cartX - 50, cartY, 100, 30);
 }
 
@@ -37,14 +37,13 @@ function drawPendulum() {
   
   ctx.beginPath();
   ctx.arc(pendulumX, pendulumY, 10, 0, Math.PI * 2);
-  ctx.fillStyle = 'red';
+  ctx.fillStyle = 'black';
   ctx.fill();
 }
 
 function updateCartPosition() {
-  // Smoothly adjust cart position towards the mouse
-  const cartSpeed = 5; // Adjust for smoother control
-  cartX += (mouseX - cartX) / cartSpeed;
+  const cartSpeed = 0.1; // Speed factor for smoother cart movement
+  cartX += (targetCartX - cartX) * cartSpeed; // Smooth transition to target position
 }
 
 function updatePhysics() {
