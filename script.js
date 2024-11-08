@@ -89,7 +89,6 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
-  // deltatime
   let currentTime = performance.now();
   deltaTime = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
   lastUpdateTime = currentTime;
