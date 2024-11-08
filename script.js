@@ -30,7 +30,7 @@ canvas.addEventListener('mousemove', (event) => {
 function drawCart() {
   ctx.fillStyle = 'grey';
   cartX_plot = 150*cartX;
-  ctx.fillRect(cartX_plot, cartY, 100, 30);
+  ctx.fillRect(cartX_plot-50, cartY, 100, 30);
 }
 
 function drawPendulum() {
@@ -56,13 +56,8 @@ function drawPendulum() {
 
 
 function updatePhysics() {  
-  // daltatime
-  const currentTime = performance.now();
-  deltaTime = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
-  lastUpdateTime = currentTime;
-
   // Spring force to mouse
-  let force_ext = 2000 * (targetCartX - cartX) - 100*cartVelocity;
+  let force_ext = 2000 * (targetCartX - cartX) - 200*cartVelocity;
 
   // Update dynamics (Euler forward)
   cartAcceleration = (
@@ -94,6 +89,11 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
+  // deltatime
+  let currentTime = performance.now();
+  deltaTime = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
+  lastUpdateTime = currentTime;
+
   cartVelocity += cartAcceleration * deltaTime;
   cartVelocity *= damping;
   angleVelocity += angleAcceleration * deltaTime;
