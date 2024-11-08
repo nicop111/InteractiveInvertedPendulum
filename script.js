@@ -57,7 +57,7 @@ function drawPendulum() {
 
 function updatePhysics() {  
   // Spring force to mouse
-  let force_ext = 2000 * (targetCartX - cartX) - 200*cartVelocity;
+  let force_ext = 2000 * (targetCartX - cartX) - 100*cartVelocity;
 
   // Update dynamics (Euler forward)
   cartAcceleration = (
