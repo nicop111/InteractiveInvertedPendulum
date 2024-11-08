@@ -9,7 +9,7 @@ let angle = Math.PI * 3/4; // Initial angle
 let angleVelocity = 0;
 let angleAcceleration = 0;
 let gravity = 9.81;
-let damping = 0.9; // Damping factor to slow motion
+let damping = 0.99; // Damping factor to slow motion
 let cartMass = 1;
 let pendulumMass = 0.1;
 
@@ -94,8 +94,10 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
-  cartVelocity += damping*cartAcceleration * deltaTime;
-  angleVelocity += damping*angleAcceleration * deltaTime;
+  cartVelocity += cartAcceleration * deltaTime;
+  cartVelocity *= damping;
+  angleVelocity += angleAcceleration * deltaTime;
+  angleVelocity *= damping;
 
   cartX += cartVelocity * deltaTime;
   angle += angleVelocity * deltaTime;
