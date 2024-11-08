@@ -17,6 +17,9 @@ let targetCartX = cartX; // Target position for the cart
 let cartVelocity = 0; // Cart velocity
 let cartAcceleration = 0; // Cart acceleration
 
+let lastUpdateTime = performance.now(); // Initialize with the current timestamp
+let deltaTime = 0; // Time difference between frames in milliseconds
+
 // Event Listener for Mouse Movement
 canvas.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
@@ -45,36 +48,55 @@ function drawPendulum() {
   ctx.fill();
 }
 
-function updateCartPosition() {
-  const cartSpeed = 0.1; // Speed factor for smoother cart movement
-  let previousCartX = cartX;
-  cartX += (targetCartX - cartX) * cartSpeed;
-  cartVelocity = cartX - previousCartX; // Calculate velocity
-  cartAcceleration = cartVelocity - (previousCartX - (cartX - cartVelocity)); // Approximate acceleration
-}
 
 function updatePhysics() {
-  // Update pendulum dynamics with cart acceleration
-  angleAcceleration = 0;
-  angleVelocity += angleAcceleration;
-  angleVelocity *= damping; // Apply damping
-  angle += angleVelocity;
-}
+  // daltatime
+  const currentTime = performance.now();
+  deltaTime = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
+  lastUpdateTime = currentTime;
 
-function logValues() {
-  logDiv.innerHTML = `
-    <strong>Cart Position (X):</strong> ${cartX.toFixed(2)} px<br>
-    <strong>Cart Velocity:</strong> ${cartVelocity.toFixed(2)} px/frame<br>
-    <strong>Cart Acceleration:</strong> ${cartAcceleration.toFixed(2)} px/frame²<br>
-    <strong>Pendulum Angle:</strong> ${(angle * 180 / Math.PI).toFixed(2)}°<br>
-    <strong>Pendulum Angular Velocity:</strong> ${angleVelocity.toFixed(2)} rad/frame<br>
-    <strong>Pendulum Angular Acceleration:</strong> ${angleAcceleration.toFixed(2)} rad/frame²
-  `;
+  // Spring force to mouse
+  let force_ext = 0.5 * (targetCartX - cartX);
+
+  // Update dynamics (Euler forward)
+  cartAcceleration = (
+    Math.sin(angle) * Math.pow(angleVelocity, 2) * Math.pow(pendulumMass, 2) * pendulumLength +
+    Math.sin(angle) * Math.pow(angleVelocity, 2) * pendulumMass * Math.pow(pendulumLength, 3) +
+    gravity * Math.cos(angle) * Math.sin(angle) * Math.pow(pendulumMass, 2) * Math.pow(pendulumLength, 2) +
+    force_ext * pendulumMass +
+    force_ext * Math.pow(pendulumLength, 2)
+  ) / (
+    -Math.pow(Math.cos(angle), 2) * Math.pow(pendulumMass, 2) * Math.pow(pendulumLength, 2) +
+    Math.pow(pendulumMass, 2) +
+    pendulumMass * Math.pow(pendulumLength, 2) +
+    cartMass * pendulumMass +
+    cartMass * Math.pow(pendulumLength, 2)
+  );
+  
+  angleAcceleration = -(
+    pendulumMass * pendulumLength * (
+      pendulumMass * pendulumLength * Math.cos(angle) * Math.sin(angle) * Math.pow(angleVelocity, 2) +
+      force_ext * Math.cos(angle) +
+      gravity * pendulumMass * Math.sin(angle) +
+      cartMass * gravity * Math.sin(angle)
+    )
+  ) / (
+    -Math.pow(Math.cos(angle), 2) * Math.pow(pendulumMass, 2) * Math.pow(pendulumLength, 2) +
+    Math.pow(pendulumMass, 2) +
+    pendulumMass * Math.pow(pendulumLength, 2) +
+    cartMass * pendulumMass +
+    cartMass * Math.pow(pendulumLength, 2)
+  );
+  
+  cartVelocity += damping*cartAcceleration * deltaTime;
+  angleVelocity += damping*angleAcceleration * deltaTime;
+
+  cartX += cartVelocity * deltaTime;
+  angle += angleVelocity * deltaTime;
 }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  updateCartPosition();
   drawCart();
   drawPendulum();
   updatePhysics();
