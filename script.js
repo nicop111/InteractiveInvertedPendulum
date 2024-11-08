@@ -9,7 +9,7 @@ let angle = Math.PI * 3/4; // Initial angle
 let angleVelocity = 0;
 let angleAcceleration = 0;
 let gravity = 9.81;
-let damping = 0.99; // Damping factor to slow motion
+let damping = 0.999; // Damping factor to slow motion
 let cartMass = 1;
 let pendulumMass = 0.1;
 
