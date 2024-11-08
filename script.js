@@ -56,7 +56,7 @@ function updatePhysics() {
   lastUpdateTime = currentTime;
 
   // Spring force to mouse
-  let force_ext = 1000 * (targetCartX - cartX) - 20*cartVelocity;
+  let force_ext = 2000 * (targetCartX - cartX) - 100*cartVelocity;
 
   // Update dynamics (Euler forward)
   cartAcceleration = (
@@ -88,11 +88,11 @@ function updatePhysics() {
     cartMass * Math.pow(pendulumLength, 2)
   );
   
-  cartVelocity += 0.7*cartAcceleration * deltaTime;
-  angleVelocity += damping*angleAcceleration * deltaTime;
+  cartVelocity += damping*cartAcceleration;
+  angleVelocity += damping*angleAcceleration;
 
-  cartX += cartVelocity * deltaTime;
-  angle += angleVelocity * deltaTime;
+  cartX += cartVelocity;
+  angle += angleVelocity ;
 }
 
 function animate() {
