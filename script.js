@@ -31,7 +31,7 @@ canvas.addEventListener('mousemove', (event) => {
 });
 
 function updatePhysics() {
-  let force_ext = 30000 * (target_x - state[0]) - 2000 * state[1];
+  let force_ext = 10000 * (target_x - state[0]) - 400 * state[1];
   if (mouse_active == false) {
     force_ext = 0;
   }
@@ -63,10 +63,10 @@ function dynamics(state, force_ext) {
   // state = [x, x_dot, phi, phi_dot]
   // return = [x_dot, x_ddot, phi_dot, phi_ddot]
   const g = 9.81;
-  const mc = 100;
-  const mp = 10;
-  const damping_x = 0.3;
-  const damping_phi = 0.5;
+  const mc = 10;
+  const mp = 1;
+  const damping_x = 0.03;
+  const damping_phi = 0.05;
   
   let x = state[0];
   let x_dot = state[1];
