@@ -18,7 +18,7 @@ damping = [damping_x*x_dot
 
 q_ddot = simplify(A\(F - b - g_vec - damping));
 
-kinetic_energy = 1/2*mc*x_dot^2 + 1/2*mp*[x_dot-phi_dot*l*cos(phi) phi_dot*l*sin(phi)]*[x_dot-phi_dot*l*cos(phi); phi_dot*l*sin(phi)];
-potential_energy = mp*g*l*(cos(phi)+1);
+kinetic_energy = 1/2*mc*x_dot^2 + 1/2*mp*[x_dot+phi_dot*l*cos(phi) phi_dot*l*sin(phi)]*[x_dot+phi_dot*l*cos(phi); phi_dot*l*sin(phi)];
+potential_energy = mp*g*l*(1-cos(phi));
 
 total_energy = simplify(kinetic_energy + potential_energy);

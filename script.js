@@ -10,17 +10,31 @@ const scaling = 200; // Example scaling 1000 pixels per meter
 let time = 0;
 let total_energy = 0;
 
-let state = [canvas.width/2/scaling, 0, 0, 0]; // Initial state [x, x_dot, phi, phi_dot]
+let mouse_active = false;
+
+let state = [canvas.width/2/scaling, 0, Math.PI, 0]; // Initial state [x, x_dot, phi, phi_dot]
 let target_x = state[0]; // Target position for the cart
 
 // Event Listener for Mouse Movement
 canvas.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  // Check if mouse is within the bounds of the canvas
+  if (mouseX >= 0 && mouseX <= canvas.width && mouseY >= 0 && mouseY <= canvas.height) {
+    mouse_active = true;
+  } else {
+    mouse_active = false;
+  }
   target_x = (event.clientX - rect.left) / scaling; // Get mouse position relative to canvas
 });
 
 function updatePhysics() {
-  let force_ext = 20000 * (target_x - state[0]) - 1500 * state[1];
+  let force_ext = 30000 * (target_x - state[0]) - 2000 * state[1];
+  if (mouse_active == false) {
+    force_ext = 0;
+  }
 
   time += h;
 
@@ -48,27 +62,27 @@ function dynamics(state, force_ext) {
   // Dynamics of a cart 
   // state = [x, x_dot, phi, phi_dot]
   // return = [x_dot, x_ddot, phi_dot, phi_ddot]
-  const g = -9.81;
+  const g = 9.81;
   const mc = 100;
-  const mp = 1;
-  const damping = 1;
+  const mp = 10;
+  const damping_x = 0.3;
+  const damping_phi = 0.5;
   
   let x = state[0];
   let x_dot = state[1];
   let phi = state[2];
   let phi_dot = state[3];
   
-  total_energy = (mp * Math.pow(x_dot - l * phi_dot * Math.cos(phi), 2)) / 2 + (mc * Math.pow(x_dot, 2)) / 2 + (Math.pow(l, 2) * mp * Math.pow(phi_dot, 2) * Math.pow(Math.sin(phi), 2)) / 2 - g * l * mp * (Math.cos(phi) + 1);
+  total_energy = (mp * Math.pow(x_dot + l * phi_dot * Math.cos(phi), 2)) / 2 + (mc * Math.pow(x_dot, 2)) / 2 + (Math.pow(l, 2) * mp * Math.pow(phi_dot, 2) * Math.pow(Math.sin(phi), 2)) / 2 - g * l * mp * (Math.cos(phi) - 1);
 
-  let x_ddot = (l * mp * Math.sin(phi) * Math.pow(phi_dot, 2) + force_ext + g * mp * Math.cos(phi) * Math.sin(phi)) / 
-  (-mp * Math.pow(Math.cos(phi), 2) + mc + mp);
-  
-  let phi_ddot = -(l * mp * Math.cos(phi) * Math.sin(phi) * Math.pow(phi_dot, 2) 
-  + force_ext * Math.cos(phi) + g * mc * Math.sin(phi) + g * mp * Math.sin(phi)) / 
+  let x_ddot = (force_ext * l + damping_phi * phi_dot * Math.cos(phi) - damping_x * l * x_dot + Math.pow(l, 2) * mp * Math.pow(phi_dot, 2) * Math.sin(phi) + g * l * mp * Math.cos(phi) * Math.sin(phi)) / 
   (l * (-mp * Math.pow(Math.cos(phi), 2) + mc + mp));
-
-  x_dot *= damping;
-  phi_dot *= damping;
+  
+  let phi_ddot = -(damping_phi * mc * phi_dot + damping_phi * mp * phi_dot + force_ext * l * mp * Math.cos(phi) + g * Math.pow(l, 1) * Math.pow(mp, 2) * Math.sin(phi) 
+  + Math.pow(l, 2) * Math.pow(mp, 2) * Math.pow(phi_dot, 2) * Math.cos(phi) * Math.sin(phi) 
+  - damping_x * l * mp * x_dot * Math.cos(phi) + g * l * mc * mp * Math.sin(phi))
+  /
+  (Math.pow(l, 2) * mp * (-mp * Math.pow(Math.cos(phi), 2) + mc + mp));
     
   return [x_dot, x_ddot, phi_dot, phi_ddot];
 }
@@ -82,10 +96,28 @@ function draw() {
   // Draw the cart
   ctx.fillStyle = 'grey';
   ctx.fillRect(x - 50, y, 100, 30);
+  
+  ctx.beginPath();
+  ctx.arc(x-30, y+38, 10, 0, Math.PI * 2);
+  ctx.fillStyle = 'grey';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x+30, y+38, 10, 0, Math.PI * 2);
+  ctx.fillStyle = 'grey';
+  ctx.fill();
+
+  // Plot street
+  ctx.beginPath();
+  ctx.moveTo(0, y+50);
+  ctx.lineTo(canvas.width, y+50);
+  ctx.strokeStyle = 'grey';
+  ctx.lineWidth = 3;
+  ctx.stroke();
 
   // Draw the pendulum
   let pendulumX = x + l_plot * Math.sin(phi); // Example scaling
-  let pendulumY = y - l_plot * Math.cos(phi);
+  let pendulumY = y + l_plot * Math.cos(phi);
 
   ctx.beginPath();
   ctx.moveTo(x, y);
