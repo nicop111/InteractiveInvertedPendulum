@@ -1,6 +1,6 @@
 clear; clc
 
-syms mc mp l phi phi_dot x x_dot g force_ext damping_x damping_phi
+syms mc mp l phi phi_dot x x_dot g force_ext force_pend_x force_pend_y damping_x damping_phi
 
 A = [mc+mp l*mp*cos(phi); l*mp*cos(phi) mp*l^2];
 
@@ -11,7 +11,7 @@ g_vec = [0;
     mp*g*l*sin(phi)];
 
 F = [force_ext; 
-    0];
+    0] + [0; l*sin(phi)]*force_pend_y + [1; l*cos(phi)]*force_pend_x;
 
 damping = [damping_x*x_dot
     damping_phi*phi_dot];

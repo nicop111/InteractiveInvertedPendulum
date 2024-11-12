@@ -13,8 +13,11 @@ let total_energy = 0;
 let mouse_active = false;
 
 let state = [canvas.width/2/scaling, 0, Math.PI, 0]; // Initial state [x, x_dot, phi, phi_dot]
-let target_x = state[0]; // Target position for the cart
+let mouse_x = 0; // Target position for the cart
+let mouse_y = 0; // Target position for the pendulum
 let force_ext = 0; // External force acting on the cart
+let force_pend_x = 0; // External force acting on the pendulum
+let force_pend_y = 0; // External force acting on the pendulum
 
 const codeInput = document.getElementById('codeInput');
 
@@ -31,23 +34,33 @@ canvas.addEventListener('mousemove', (event) => {
   } else {
     mouse_active = false;
   }
-  target_x = (event.clientX - rect.left) / scaling; // Get mouse position relative to canvas
+  mouse_x = (event.clientX - rect.left) / scaling; // Get mouse position relative to canvas
+  mouse_y = 1.5-(event.clientY - rect.top) / scaling; // Get mouse position relative to canvas
 });
 
 function updatePhysics() {
+  let x = state[0];
+  let x_dot = state[1];
+  let phi = state[2];
+  let phi_dot = state[3];
+  const userCode = codeInput.value;
+  try {
+    eval(userCode);
+  } catch (e) {
+    console.error('Error evaluating user code:', e);
+    force_ext = 0;
+  }
+
+  let pendulumX = x + l * Math.sin(phi); // Example scaling
+  let pendulumX_dot = x_dot + l * phi_dot * Math.cos(phi);
+  let pendulumY = -l* Math.cos(phi);
+  let pendulumY_dot = l * phi_dot * Math.sin(phi);
   if (mouse_active) {
-    force_ext = 10 * (target_x - state[0]);
+    force_pend_x = 1000*(mouse_x - pendulumX) - 100*pendulumX_dot;
+    force_pend_y = 1000*(mouse_y - pendulumY) - 100*pendulumY_dot;
   } else {
-    let x = state[0];
-    let x_dot = state[1];
-    let phi = state[2];
-    let phi_dot = state[3];
-    const userCode = codeInput.value;
-    try {
-      eval(userCode);
-    } catch (e) {
-      console.error('Error evaluating user code:', e);
-    }
+    force_pend_x = 0;
+    force_pend_y = 0;
   }
 
   time += h;
@@ -88,19 +101,30 @@ function dynamics(state, force_ext) {
   
   total_energy = (mp * Math.pow(x_dot + l * phi_dot * Math.cos(phi), 2)) / 2 + (mc * Math.pow(x_dot, 2)) / 2 + (Math.pow(l, 2) * mp * Math.pow(phi_dot, 2) * Math.pow(Math.sin(phi), 2)) / 2 - g * l * mp * (Math.cos(phi) - 1);
 
-  let x_ddot = (force_ext * l + damping_phi * phi_dot * Math.cos(phi) - damping_x * l * x_dot + Math.pow(l, 2) * mp * Math.pow(phi_dot, 2) * Math.sin(phi) + g * l * mp * Math.cos(phi) * Math.sin(phi)) / 
-  (l * (-mp * Math.pow(Math.cos(phi), 2) + mc + mp));
+  let x_ddot = (force_ext * l + damping_phi * phi_dot * Math.cos(phi) - (force_pend_y * l * Math.sin(2 * phi)) / 2 - damping_x * l * x_dot + l ** 2 * mp * phi_dot ** 2 * Math.sin(phi) + (g * l * mp * Math.sin(2 * phi)) / 2) 
+              / (l * (-mp * Math.cos(phi) ** 2 + mc + mp));
   
-  let phi_ddot = -(damping_phi * mc * phi_dot + damping_phi * mp * phi_dot + force_ext * l * mp * Math.cos(phi) + g * Math.pow(l, 1) * Math.pow(mp, 2) * Math.sin(phi) 
-  + Math.pow(l, 2) * Math.pow(mp, 2) * Math.pow(phi_dot, 2) * Math.cos(phi) * Math.sin(phi) 
-  - damping_x * l * mp * x_dot * Math.cos(phi) + g * l * mc * mp * Math.sin(phi))
-  /
-  (Math.pow(l, 2) * mp * (-mp * Math.pow(Math.cos(phi), 2) + mc + mp));
+  let phi_ddot = -(damping_phi * mc * phi_dot + damping_phi * mp * phi_dot + (l ** 2 * mp ** 2 * phi_dot ** 2 * Math.sin(2 * phi)) / 2 - force_pend_x * l * mc * Math.cos(phi) + force_ext * l * mp * Math.cos(phi) - force_pend_y * l * mc * Math.sin(phi) - force_pend_y * l * mp * Math.sin(phi) + g * l * mp ** 2 * Math.sin(phi) - damping_x * l * mp * x_dot * Math.cos(phi) + g * l * mc * mp * Math.sin(phi)) 
+              / (l ** 2 * mp * (-mp * Math.cos(phi) ** 2 + mc + mp));
     
   return [x_dot, x_ddot, phi_dot, phi_ddot];
 }
 
+function perfectFeedback() {
+  let x = state[0];
+  let x_dot = state[1];
+  let phi = state[2];
+  let phi_dot = state[3];
+  
+  let x_des = 2.5;
+  let phi_des = Math.PI;
+  let delta_x = x_des-x;
 
+  phi_des = phi_des - delta_x*0.10;
+  phi_des_dot = x_dot * 0.6;
+
+  return 1600*(phi_des-phi)+320*(phi_des_dot-phi_dot)+80*(delta_x)-24*x_dot;
+}
 
 function draw() { 
   let x = scaling * state[0];
@@ -151,9 +175,14 @@ function draw() {
   ctx.moveTo(x, y+15);
   ctx.lineTo(x + force_ext, y+15);
   ctx.strokeStyle = 'red';
-  if (mouse_active) {
-    ctx.strokeStyle = 'orange';
-  }
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Draw external force on pendulum
+  ctx.beginPath();
+  ctx.moveTo(pendulumX, pendulumY);
+  ctx.lineTo(pendulumX + force_pend_x/5, pendulumY - force_pend_y/5);
+  ctx.strokeStyle = 'orange';
   ctx.lineWidth = 3;
   ctx.stroke();
 
@@ -171,6 +200,7 @@ function draw() {
   ctx.fillText(`force_ext: ${force_ext.toFixed(2)}`, 10, 20 * (state.length + 2));  
   // Display elapsed time
   ctx.fillText(`time: ${time.toFixed(2)} s`, 10, 20 * (state.length + 3));
+  
 }
 
 // Run simulation at fixed frequency (e.g., 60 Hz)
@@ -178,4 +208,4 @@ setInterval(() => {
   updatePhysics();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   draw();
-}, 1000 * h); // 1000 ms divided by 60 Hz
+}, 1000 * h ); // 1000 ms divided by 60 Hz
