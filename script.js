@@ -29,7 +29,7 @@ canvas.addEventListener('mousemove', (event) => {
 
   // Check if mouse is within the bounds of the canvas
   mouse_active = true;
-  if (mouseX >= 0+10 && mouseX <= canvas.width-10 && mouseY >= 0+10 && mouseY <= canvas.height-10) {
+  if (mouseX >= 0+10 && mouseX <= canvas.width-10 && mouseY >= 0+10 && mouseY <= canvas.height-200) {
     mouse_active = true;
   } else {
     mouse_active = false;
@@ -123,7 +123,7 @@ function perfectFeedback() {
   phi_des = phi_des - delta_x*0.10;
   phi_des_dot = x_dot * 0.6;
 
-  return 1600*(phi_des-phi)+320*(phi_des_dot-phi_dot)+80*(delta_x)-24*x_dot;
+  return 5*(1600*(phi_des-phi)+320*(phi_des_dot-phi_dot)+80*(delta_x)-24*x_dot);
 }
 
 function draw() { 
