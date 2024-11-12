@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pendulum on a Cart Simulation</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation</title>
 </head>
 <body>
-  <h1>Pendulum on a Cart</h1>
-  <canvas id="simulationCanvas" width="800" height="400"></canvas>
-  <script src="script.js"></script>
+    <canvas id="simulationCanvas"></canvas>
+    <textarea id="codeInput" rows="10" cols="50">force_ext = 600 * (target_x - state[0]) - 60 * state[1];</textarea>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@ canvas.height = 550;
 const ctx = canvas.getContext('2d');
 
 
-const h = 1 / 60; // Fixed stepsize for simulation and animation
+const h = 1 / 120; // Fixed stepsize for simulation and animation
 const l = 1;
 const scaling = 200; // Example scaling 1000 pixels per meter
 let time = 0;
@@ -14,6 +14,9 @@ let mouse_active = false;
 
 let state = [canvas.width/2/scaling, 0, Math.PI, 0]; // Initial state [x, x_dot, phi, phi_dot]
 let target_x = state[0]; // Target position for the cart
+let force_ext = 0; // External force acting on the cart
+
+const codeInput = document.getElementById('codeInput');
 
 // Event Listener for Mouse Movement
 canvas.addEventListener('mousemove', (event) => {
@@ -22,7 +25,8 @@ canvas.addEventListener('mousemove', (event) => {
   const mouseY = event.clientY - rect.top;
 
   // Check if mouse is within the bounds of the canvas
-  if (mouseX >= 0 && mouseX <= canvas.width && mouseY >= 0 && mouseY <= canvas.height) {
+  mouse_active = true;
+  if (mouseX >= 0+10 && mouseX <= canvas.width-10 && mouseY >= 0+10 && mouseY <= canvas.height-10) {
     mouse_active = true;
   } else {
     mouse_active = false;
@@ -31,15 +35,24 @@ canvas.addEventListener('mousemove', (event) => {
 });
 
 function updatePhysics() {
-  let force_ext = 10000 * (target_x - state[0]) - 400 * state[1];
-  if (mouse_active == false) {
-    force_ext = 0;
+  if (mouse_active) {
+    force_ext = 10 * (target_x - state[0]);
+  } else {
+    let x = state[0];
+    let x_dot = state[1];
+    let phi = state[2];
+    let phi_dot = state[3];
+    const userCode = codeInput.value;
+    try {
+      eval(userCode);
+    } catch (e) {
+      console.error('Error evaluating user code:', e);
+    }
   }
 
   time += h;
 
-  state = rungeKuttaStep(state, force_ext, h);  
-
+  state = rungeKuttaStep(state, force_ext, h);
 }
 
 function rungeKuttaStep(state, force_ext, h) {
@@ -87,6 +100,8 @@ function dynamics(state, force_ext) {
   return [x_dot, x_ddot, phi_dot, phi_ddot];
 }
 
+
+
 function draw() { 
   let x = scaling * state[0];
   let phi = state[2];
@@ -131,6 +146,17 @@ function draw() {
   ctx.fillStyle = 'black';
   ctx.fill();
 
+  // Draw external force
+  ctx.beginPath();
+  ctx.moveTo(x, y+15);
+  ctx.lineTo(x + force_ext, y+15);
+  ctx.strokeStyle = 'red';
+  if (mouse_active) {
+    ctx.strokeStyle = 'orange';
+  }
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
   // Display the current state as text
   ctx.font = '16px Arial';
   ctx.fillStyle = 'black';
@@ -141,8 +167,10 @@ function draw() {
   });
   // Display total energy
   ctx.fillText(`energy: ${total_energy.toFixed(2)}`, 10, 20 * (state.length + 1));
+  //Display external force
+  ctx.fillText(`force_ext: ${force_ext.toFixed(2)}`, 10, 20 * (state.length + 2));  
   // Display elapsed time
-  ctx.fillText(`time: ${time.toFixed(2)} s`, 10, 20 * (state.length + 2));
+  ctx.fillText(`time: ${time.toFixed(2)} s`, 10, 20 * (state.length + 3));
 }
 
 // Run simulation at fixed frequency (e.g., 60 Hz)
