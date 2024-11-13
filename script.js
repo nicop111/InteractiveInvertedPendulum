@@ -12,7 +12,7 @@ let total_energy = 0;
 
 let mouse_active = false;
 
-let state = [canvas.width/2/scaling, 0, Math.PI, 0]; // Initial state [x, x_dot, phi, phi_dot]
+let state = [canvas.width/2/scaling, 0, 0*Math.PI, 0]; // Initial state [x, x_dot, phi, phi_dot]
 let mouse_x = 0; // Target position for the cart
 let mouse_y = 0; // Target position for the pendulum
 let force_ext = 0; // External force acting on the cart
@@ -20,6 +20,9 @@ let force_pend_x = 0; // External force acting on the pendulum
 let force_pend_y = 0; // External force acting on the pendulum
 
 let codeInvalid = false;
+
+let swingUpSequence = false;
+let timer = 0;
 
 const codeInput = document.getElementById('codeInput');
 
@@ -124,10 +127,43 @@ function perfectFeedback() {
   let phi_des = Math.PI;
   let delta_x = x_des-x;
 
-  phi_des = phi_des - delta_x*0.10;
+  phi_des = phi_des - delta_x*0.15;
   phi_des_dot = x_dot * 0.6;
 
-  return 2600*(phi_des-phi)+530*(phi_des_dot-phi_dot)+130*(delta_x)-100*x_dot;
+  let feedback = 0;
+
+  if (Math.abs(phi - Math.PI) < Math.PI*0.3) {
+    feedback = 3000*(phi_des-phi)+600*(phi_des_dot-phi_dot)+130*(delta_x)-100*x_dot;
+  }
+
+  if (phi < Math.PI/2 || phi > 3*Math.PI/2) {
+    let phi_normed = phi;
+    x_des = 0.2;
+    if (phi > Math.PI) {
+      phi_normed = phi - 2*Math.PI;
+    }
+    feedback = 5*(75*(x_des-x)-100*x_dot+200*Math.sin(phi));
+    if (Math.abs(phi_dot) < 0.05 && Math.abs(x_dot) < 0.05 && Math.abs(x-x_des) < 0.05) {
+      swingUpSequence = true;
+      timer = time;
+    }
+  }
+
+  if (swingUpSequence) {
+    feedback = 0;
+    if (time - timer < 0.2) {
+      feedback = 350;
+    } 
+    if (time - timer > 0.3) {
+      feedback = -350;
+    }
+    if (Math.abs(phi - Math.PI) < Math.PI*0.3) {
+      swingUpSequence = false;
+    }
+    
+  }
+
+  return feedback;
 }
 
 function draw() { 
