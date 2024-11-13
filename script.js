@@ -19,6 +19,8 @@ let force_ext = 0; // External force acting on the cart
 let force_pend_x = 0; // External force acting on the pendulum
 let force_pend_y = 0; // External force acting on the pendulum
 
+let codeInvalid = false;
+
 const codeInput = document.getElementById('codeInput');
 
 // Event Listener for Mouse Movement
@@ -46,8 +48,10 @@ function updatePhysics() {
   const userCode = codeInput.value;
   try {
     eval(userCode);
+    codeInvalid = false;
   } catch (e) {
     console.error('Error evaluating user code:', e);
+    codeInvalid = true;
     force_ext = 0;
   }
 
@@ -200,6 +204,11 @@ function draw() {
   ctx.fillText(`force_ext: ${force_ext.toFixed(2)}`, 10, 20 * (state.length + 2));  
   // Display elapsed time
   ctx.fillText(`time: ${time.toFixed(2)} s`, 10, 20 * (state.length + 3));
+  // Display code status
+  if (codeInvalid) {
+    ctx.fillStyle = 'red';
+    ctx.fillText('Invalid code', 10, 20 * (state.length + 4));
+  }
   
 }
 
