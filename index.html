@@ -7,7 +7,9 @@
 </head>
 <body>
     <canvas id="simulationCanvas"></canvas>
-    Add your own feedback control by defining force_ext as a function of the state variables x, x_dot, phi, phi_dot
+    <div>
+        <label for="codeInput">Add your own feedback control by defining force_ext as a (javascript) function of the state variables x, x_dot, phi, phi_dot:</label>
+    </div>
     <textarea id="codeInput" rows="10" cols="50">force_ext = 0*perfectFeedback();</textarea>
     <script src="script.js"></script>
 </body>

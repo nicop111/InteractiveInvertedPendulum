@@ -123,7 +123,7 @@ function perfectFeedback() {
   phi_des = phi_des - delta_x*0.10;
   phi_des_dot = x_dot * 0.6;
 
-  return 5*(1600*(phi_des-phi)+320*(phi_des_dot-phi_dot)+80*(delta_x)-24*x_dot);
+  return 2600*(phi_des-phi)+530*(phi_des_dot-phi_dot)+130*(delta_x)-100*x_dot;
 }
 
 function draw() { 
